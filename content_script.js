@@ -240,122 +240,128 @@ function cloneArray (array) {
  }
 }
 
+
+
+
+
+
+
+
 function moveSection (section) {
  var direction = section.snake.direction
  var x = section.snake.x
  var y = section.snake.y
  var futureTurns = section.snake.futureTurns
  if (futureTurns) {
-    var currentTurn = section.snake.currentTurn
-    var currentIndex = multiplyNumbers(currentTurn, 3)
-    var currentX = getValue(futureTurns, currentIndex)
-    if (currentX !== undefined) {
-      var nextIndex = addNumbers(currentX, 1)
-      var currentY = getValue(futureTurns, nextIndex)
-      if (areSame(currentX, x)) {
-       if (areSame(currentY, y)) {
-        var nextNext = addNumbers(nextIndex, 1)
-        var currentDirection = getValue(futureTurns, nextNext)
-        section.snake.direction = currentDirection
-        currentTurn = addNumbers(currentTurn, 1)
-        section.snake.currentTurn = currentTurn
-       }
-      }
+  var currentTurn = section.snake.currentTurn
+  var currentIndex = multiplyNumbers(currentTurn, 3)
+  var currentX = getValue(futureTurns, currentIndex)
+  if (currentX !== undefined) {
+   var nextIndex = addNumbers(currentX, 1)
+   var currentY = getValue(futureTurns, nextIndex)
+   if (areSame(currentX, x)) {
+    if (areSame(currentY, y)) {
+     var nextNext = addNumbers(nextIndex, 1)
+     var currentDirection = getValue(futureTurns, nextNext)
+     section.snake.direction = currentDirection
+     currentTurn = addNumbers(currentTurn, 1)
+     section.snake.currentTurn = currentTurn
     }
+   }
   }
-  if (direction === 'left') {
-    x = differenceNumbers(x, 1)
-  }  
-  else if (direction === 'down') {
-    y = addNumbers(y, 1)
-  }  
-  else if (direction === 'right') {
-    x = addNumbers(x, 1)
-  }  
-  else if (direction === 'up') {
-    y = differenceNumbers(y, 1)
+ }
+ if (direction === 'left') {
+  x = differenceNumbers(x, 1)
+ }  
+ else if (direction === 'down') {
+  y = addNumbers(y, 1)
+ }  
+ else if (direction === 'right') {
+  x = addNumbers(x, 1)
+ }  
+ else if (direction === 'up') {
+  y = differenceNumbers(y, 1)
+ }
+ var newID = concatenateStrings(x, concatenateStrings('-', y))
+ var currentID = getValue(section, 'id')
+ if (areSame(currentID, 'head')) {
+  var foundOverlap = document.getElementById(newID)
+  if (foundOverlap) {
+   game_over = true
+   return
   }
-  var newID = concatenateStrings(x, concatenateStrings('-', y))
-  var currentID = getValue(section, 'id')
-  if (areSame(currentID, 'head')) {
-    var foundOverlap = document.getElementById(newID)
-    if (foundOverlap) {
-      game_over = true
-      return
-    }
-  }
-  else {
-    setValue(section, 'id', newID)
-  }
-  section.snake.x = x
-  section.snake.y = y
-  section.style.left = concatenateStrings(multiplyNumbers(x, unit_square), 'px')
-  section.style.top = concatenateStrings(multiplyNumbers(y, unit_square), 'px')
-  var attachedSection = section.snake.next
-  if (attachedSection) {
-    moveSection(attachedSection)
-  }
+ }
+ else {
+  setValue(section, 'id', newID)
+ }
+ section.snake.x = x
+ section.snake.y = y
+ section.style.left = concatenateStrings(multiplyNumbers(x, unit_square), 'px')
+ section.style.top = concatenateStrings(multiplyNumbers(y, unit_square), 'px')
+ var attachedSection = section.snake.next
+ if (attachedSection) {
+   moveSection(attachedSection)
+ }
 }
 
 function createSection (x, y) {
-  var section = document.createElement('div')
-  section.snake = {}
-  section.id = concatenateStrings(x, concatenateStrings('-', y))
-  section.snake.x = x
-  section.snake.y = y
-  section_style = getValue(section, 'style')
-  setValue(section_style, 'height', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
-  setValue(section_style, 'width', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
-  setValue(section_style, 'borderRadius', '50%')
-  setValue(section_style, 'background', element_color)
-  setValue(section_style, 'opacity', element_opacity)
-  setValue(section_style, 'position', 'absolute')
-  setValue(section_style, 'left', concatenateStrings(toString(multiplyNumbers(x, unit_square)), + 'px'))
-  setValue(section_style, 'top', concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px'))
-  setValue(section_style, 'zIndex', 100000)
-  setValue(section_style, 'border', '2px solid blue')
-  game_screen.appendChild(section)
-  return section
+ var section = document.createElement('div')
+ section.snake = {}
+ section.id = concatenateStrings(x, concatenateStrings('-', y))
+ section.snake.x = x
+ section.snake.y = y
+ section_style = getValue(section, 'style')
+ setValue(section_style, 'height', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
+ setValue(section_style, 'width', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
+ setValue(section_style, 'borderRadius', '50%')
+ setValue(section_style, 'background', element_color)
+ setValue(section_style, 'opacity', element_opacity)
+ setValue(section_style, 'position', 'absolute')
+ setValue(section_style, 'left', concatenateStrings(toString(multiplyNumbers(x, unit_square)), + 'px'))
+ setValue(section_style, 'top', concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px'))
+ setValue(section_style, 'zIndex', 100000)
+ setValue(section_style, 'border', '2px solid blue')
+ game_screen.appendChild(section)
+ return section
 }
 
 function moveFood () {
-  var foodX = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(width_squares, 1)))
-  var foodY = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(height_squares, 1)))
-  var potentialID = concatenateStrings(foodX, concatenateStrings('-', foodY))
-  var snakeSection = document.getElementById(potentialID)
-  if (snakeSection) {
-    moveFood()
-  }
-  else {
-    food.snake.x = foodX
-    food.snake.y = foodY
-    var foodLeft = multiplyNumbers(foodX, unit_square)
-    var foodTop = multiplyNumbers(foodY, unit_square)
-    food.style.left = concatenateStrings(toString(foodLeft), 'px')
-    food.style.top = concatenateStrings(toString(foodTop), 'px')
-  }
+ var foodX = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(width_squares, 1)))
+ var foodY = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(height_squares, 1)))
+ var potentialID = concatenateStrings(foodX, concatenateStrings('-', foodY))
+ var snakeSection = document.getElementById(potentialID)
+ if (snakeSection) {
+  moveFood()
+  return
+ }
+ food.snake.x = foodX
+ food.snake.y = foodY
+ var foodLeft = multiplyNumbers(foodX, unit_square)
+ var foodTop = multiplyNumbers(foodY, unit_square)
+ food.style.left = concatenateStrings(toString(foodLeft), 'px')
+ food.style.top = concatenateStrings(toString(foodTop), 'px')
 }
 
 function moveClose () {
-  var foodLeft = food.style.left
-  var foodTop = food.style.top
-  if (areSame(foodTop, starting_top)) {
-    if (areSame(foodLeft, starting_left)) {
-      moveFood()
-      moveClose()
-      return
-    }
-    if (areSame(differenceNumbers(foodLeft, 1), starting_left)) {
-      moveFood()
-      moveClose()
-      return
-    }
-    if (areSame(differenceNumbers(foodLeft, 2), starting_left)) {
-      moveFood()
-      moveClose()
-      return
-    }
+ var foodLeft = food.style.left
+ var foodTop = food.style.top
+ if (areSame(foodTop, starting_top)) {
+  if (areSame(foodLeft, starting_left)) {
+   moveFood()
+   moveClose()
+   return
   }
+  if (areSame(differenceNumbers(foodLeft, 1), starting_left)) {
+   moveFood()
+   moveClose()
+   return
+  }
+  if (areSame(differenceNumbers(foodLeft, 2), starting_left)) {
+   moveFood()
+   moveClose()
+   return
+  }
+ }
 }
 
 }
