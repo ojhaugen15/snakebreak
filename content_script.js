@@ -62,7 +62,6 @@ head.id = 'head'
 body_node.addEventListener('keydown', keyDown)
 setTimeout(moveSnake, refresh_milliseconds)
 
-
 function gameOver() {
  game_over = true
  body_node.removeChild(game_screen)
@@ -79,7 +78,7 @@ function keyDown (eventInfo) {
   if (direction_chosen) {
     return
   }
-  if (eventKey === 'ArrowLeft') {
+  if (areSame(eventKey, 'ArrowLeft')) {
     var currentDirection = head.snake.direction
     if (arentSame(currentDirection, 'right')) {
      if (arentSame(currentDirection, 'left')) {
@@ -88,7 +87,7 @@ function keyDown (eventInfo) {
      }
     }
   }
-  else if (key === 'ArrowRight') {
+  else if (areSame(key, 'ArrowRight')) {
     var currentDirection = head.snake.direction
     if (arentSame(currentDirection, 'right')) {
      if (arentSame(currentDirection, 'left')) {
@@ -97,7 +96,7 @@ function keyDown (eventInfo) {
     }
    }
   }
-  else if (key === 'ArrowUp') {
+  else if (areSame(key, 'ArrowUp')) {
     var currentDirection = head.snake.direction
     if (arentSame(currentDirection, 'top')) {
      if (arentSame(currentDirection, 'down')) {
@@ -106,7 +105,7 @@ function keyDown (eventInfo) {
     }
     }
   }
-  else if (key === 'ArrowDown') {
+  else if (areSame(key, 'ArrowDown')) {
     var currentDirection = head.snake.direction
     if (arentSame(currentDirection, 'top')) {
      if (arentSame(currentDirection, 'down')) {
@@ -190,28 +189,28 @@ function addSection (currentSection) {
     addSection(attachedSection)
   }
   else {
-    var currentSectionFutureTurns = currentSection.snake.futureTurns
-    var currentSectionDirection = currentSection.snake.direction
-    var currentSectionX = currentSection.snake.x
-    var currentSectionY = currentSection.snake.y
-    var nextSectionX = currentSectionX
-    var nextSectionY = currentSectionY
-    if (areSame(currentSectionDirection, 'left')) {
-      nextSectionX = addNumbers(nextSectionX, 1)
+    var futureTurns = currentSection.snake.futureTurns
+    var currentDirection = currentSection.snake.direction
+    var currentX = currentSection.snake.x
+    var currentY = currentSection.snake.y
+    var nextX = currentX
+    var nextY = currentY
+    if (areSame(currentDirection, 'left')) {
+      nextX = addNumbers(nextnX, 1)
     }
-    else if (areSame(currentSectionDirection, 'right')) {
-      nextSectionX = differenceNumbers(nextSectionX, 1)
+    else if (areSame(currentDirection, 'right')) {
+      nextX = differenceNumbers(nextX, 1)
     }
-    else if (areSame(currentSectionDirection, 'up')) {
-      nextSectionY = addNumbers(nextSectionY, 1)
+    else if (areSame(currentDirection, 'up')) {
+      nextY = addNumbers(nextY, 1)
     }
     else if (areSame(currentSectionDirection, 'down')) {
-      nextSectionY = differenceNumbers(nextSectionY, 1)
+      nextY = differenceNumbers(nextY, 1)
     }
-    var nextSection = createSection(nextSectionX, nextSectionY)
+    var nextSection = createSection(nextX, nextY)
     currentSection.snake.next = nextSection
-    nextSection.snake.direction = currentSectionDirection
-    nextSection.snake.futureTurns = cloneArray(currentSectionFutureTurns)
+    nextSection.snake.direction = currentDirection
+    nextSection.snake.futureTurns = cloneArray(currentTurns)
   }
 }
 
@@ -228,16 +227,16 @@ function moveSection (section) {
   var futureTurns = section.snake.futureTurns
   if (futureTurns) {
     var currentTurn = section.snake.currentTurn
-    var currentTurnIndex = multiplyNumbers(currentTurn, 3)
-    var currentTurnX = getValue(futureTurns, currentTurnIndex)
-    if (currentTurnX !== undefined) {
-      var nextIndex = addNumbers(currentTurnX, 1)
-      var currentTurnY = getValue(futureTurns, nextIndex)
-      if (areSame(currentTurnX, x)) {
-       if (areSame(currentTurnY, y)) {
-        var indexAfterNext = addNumbers(nextIndex, 1)
-        var currentTurnDirection = getValue(futureTurns, indexAfterNext)
-        section.snake.direction = currentTurnDirection
+    var currentIndex = multiplyNumbers(currentTurn, 3)
+    var currentX = getValue(futureTurns, currentIndex)
+    if (currentX !== undefined) {
+      var nextIndex = addNumbers(currentX, 1)
+      var currentY = getValue(futureTurns, nextIndex)
+      if (areSame(currentX, x)) {
+       if (areSame(currentY, y)) {
+        var nextNext = addNumbers(nextIndex, 1)
+        var currentDirection = getValue(futureTurns, nextNext)
+        section.snake.direction = currentDirection
         currentTurn = addNumbers(currentTurn, 1)
         section.snake.currentTurn = currentTurn
        }
@@ -284,16 +283,17 @@ function createSection (x, y) {
   section.id = concatenateStrings(x, concatenateStrings('-', y))
   section.snake.x = x
   section.snake.y = y
-  section.style.height = concatenateStrings(toString(addNumbers(unit_square, 1)), 'px')
-  section.style.width = concatenateStrings(toString(addNumbers(unit_square, 1)), 'px')
-  section.style.borderRadius = '50%'
-  section.style.background = element_color
-  section.style.opacity = element_opacity
-  section.style.position = 'absolute'
-  section.style.left = concatenteStrings(toString(multiplyNumbers(x, unit_square)), + 'px')
-  section.style.top = concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px')
-  section.style.zIndex = 100000
-  section.style.border = '2px solid blue'
+  section_style = getValue(section, 'style')
+  setValue(section_style, 'height', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
+  setValue(section_style, 'width', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
+  setValue(section_style, 'borderRadius', '50%')
+  setValue(section_style, 'background', element_color)
+  setValue(section_style, 'opacity', element_opacity)
+  setValue(section_style, 'position', 'absolute')
+  setValue(section_style, 'left', concatenateStrings(toString(multiplyNumbers(x, unit_square)), + 'px'))
+  setValue(section_style, 'top', concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px'))
+  setValue(section_style, 'zIndex', 100000)
+  setValue(section_style, 'border', '2px solid blue')
   game_screen.appendChild(section)
   return section
 }
