@@ -1,23 +1,23 @@
 //snakebreak
 
-app_id = 'snake_game_screen'
+app_id = 'snake_break'
 app_loaded = document.getElementById(app_id)
 if (app_loaded) {
-  gameOver()
+ gameOver()
 }
 else {
 
-body_node = document.body
+body_node = getValue(document, 'body')
 
 unit_square = 30
-width_squares = Math.floor( ( window.innerWidth - 2 * unit_square ) / unit_square )
-height_squares = Math.floor( ( window.innerHeight - 2 * unit_square ) / unit_square )
-game_width = width_squares * unit_square
-game_height = height_squares * unit_square
-middle_x = Math.ceil( ( width_squares - 1 ) / 2 )
-middle_y = Math.ceil( ( height_squares - 1 ) / 2 )
-starting_left = middle_x * unit_square + 'px'
-starting_top = middle_y * unit_square + 'px'
+width_squares = roundDown(quotientNumbers(differenceNumbers(getValue(window, 'innerWidth'), multiplyNumbers(2, unit_square)), unit_square))
+height_squares = roundDown(quotientNumbers(differenceNumbers(window.innerHeight, multiplyNumbers(2, unit_square)), unit_square))
+game_width = multiplyNumbers(width_squares, unit_square)
+game_height = multiplyNumbers(height_squares, unit_square)
+middle_x = roundUp(quotientNumbers(differenceNumbers(width_squares, 1), 2))
+middle_y = roundUp(quotientNumbers(differenceNumbers(height_squares, 1), 2))
+starting_left = concatenateStrings(toString(multiplyNumbers(middle_x, unit_square)), 'px')
+starting_top = concatenateStrings(toString(multiplyNumbers(middle_x, unit_square)), 'px')
 refresh_milliseconds = 750
 refresh_decrement = 10
 direction_chosen = false
@@ -27,50 +27,51 @@ element_color = 'white'
 element_opacity = '50%'
 
 game_screen = document.createElement('div')
-game_screen.id = APP_ID
-game_screen.style.height = game_height + 'px'
-game_screen.style.width = game_width + 'px'
-game_screen.style.background = 'black'
-game_screen.style.opacity = '20%'
-game_screen.style.position = 'absolute'
-game_screen.style.left = unit_square + 'px'
-game_screen.style.top = unit_square + 'px'
-game_screen.style.zIndex = 100000
-game_screen.style.border = '5px solid blue'
-game_screen.style.borderRadius = '10px'
+setValue(game_screen, 'id', app_id)
+game_style = setValue(game_screen, 'style')
+setValue(game_style, 'height', concatenateStrings(toString(game_height), 'px'))
+setValue(game_style, 'width', concatenateStrings(toString(game_width), 'px'))
+setValue(game_style, 'background', 'black')
+setValue(game_style, 'opacity', '20%')
+setValue(game_style, 'position', 'absolute')
+setValue(game_style, 'left', concatenateStrings(toString(unit_square), 'px'))
+setValue(game_style, 'top', concatenateStrings(toString(game_height), 'px'))
+setValue(game_style, 'zIndex', 100000)
+setValue(game_style, 'border', '5px solid blue')
+setValue(game_style, 'borderRadius' '10px')
 body_node.appendChild(game_screen)
 
 food = document.createElement('div')
 food.snake = {}
-food.style.width = unit_square + 'px'
-food.style.height = unit_square + 'px'
-food.style.background = ELEMENT_COLOR
-food.style.opacity = ELEMENT_OPACITY
-food.style.position = 'absolute'
-food.style.zIndex = 100000
-food.style.border = '2px solid blue'
+setValue(food_style, 'width', concatenateStrings(toString(unit_square), 'px'))
+setValue(food_style, 'height', concatenateStrings(toString(unit_square), 'px'))
+setValue(food_style, 'background', element_color)
+setValue(food_style, 'opacity', element_opacity)
+setValue(food_style, 'position', 'absolute')
+setValue(food_style, 'zIndex', 100000)
+setValue(food_style, 'border', '2px solid blue')
 game_screen.appendChild(food)
 
-movefood()
-movefoodIfTooCloseToStart()
-head = createSnakeSection(middle_x, middle_y)
+moveFood()
+moveClose()
+head = createSection(middle_x, middle_y)
 head.snake.direction = 'left'
 head.style.background = 'blue'
 head.style.border = '2px solid white'
 head.id = 'head'
 body_node.addEventListener('keydown', keyDown)
-setTimeout(moveSnake, REFRESH_MILLISECONDS)
+setTimeout(moveSnake, refresh_milliseconds)
 
 
 function gameOver() {
-  game_over = true
-  body_node.removeChild(game_screen)
-  body_node.removeEventListener('keydown', keyDown)
+ game_over = true
+ body_node.removeChild(game_screen)
+ body_node.removeEventListener('keydown', keyDown)
 }
 
-function keyDown (event) {
-  var key = event.key
-  if (key === 'Escape') {
+function keyDown (eventInfo) {
+ var eventKey = getValue(eventInfo, 'key')
+  if (areSame(eventKey, 'Escape')) {
     gameOver()
     return
   }
@@ -78,33 +79,41 @@ function keyDown (event) {
   if (direction_chosen) {
     return
   }
-  if (key === 'ArrowLeft') {
-    var direction = head.snake.direction
-    if (direction !== 'right' && direction !== 'left') {
+  if (eventKey === 'ArrowLeft') {
+    var currentDirection = head.snake.direction
+    if (arentSame(currentDirection, 'right')) {
+     if (arentSame(currentDirection, 'left')) {
       var newDirection = 'left'
       head.snake.direction = newDirection
+     }
     }
   }
   else if (key === 'ArrowRight') {
-    var direction = head.snake.direction
-    if (direction !== 'right' && direction !== 'left') {
+    var currentDirection = head.snake.direction
+    if (arentSame(currentDirection, 'right')) {
+     if (arentSame(currentDirection, 'left')) {
       var newDirection = 'right'
       head.snake.direction = newDirection
     }
+   }
   }
   else if (key === 'ArrowUp') {
-    var direction = head.snake.direction
-    if (direction !== 'down' && direction !== 'up') {
+    var currentDirection = head.snake.direction
+    if (arentSame(currentDirection, 'top')) {
+     if (arentSame(currentDirection, 'down')) {
       var newDirection = 'up'
       head.snake.direction = newDirection
     }
+    }
   }
   else if (key === 'ArrowDown') {
-    var direction = head.snake.direction
-    if (direction !== 'down' && direction !== 'up') {
+    var currentDirection = head.snake.direction
+    if (arentSame(currentDirection, 'top')) {
+     if (arentSame(currentDirection, 'down')) {
       var newDirection = 'down'
       head.snake.direction = newDirection
     }
+   }
   }
   if (newDirection) {
     direction_chosen = true
@@ -126,18 +135,29 @@ function moveSnake () {
     }
   }
   moveSection(head)
-  var newheadX = head.snake.x
-  var newheadY = head.snake.y
+  var newX = head.snake.x
+  var newY = head.snake.y
   var foodX = food.snake.x
   var foodY = food.snake.y
-  if (newheadX === foodX && newheadY === foodY) {
-    movefood()
+  if (areSame(newX, foodX)) {
+   if (areSame(newY, foodY)) {
+    moveFood()
     addSection()
-    REFRESH_MILLISECONDS -= REFRESH_DECREMENT
+    refresh_milliseconds = differenceNumbers(refresh_milliseconds, refresh_decrement)
+   }
   }
-  setTimeout(moveSnake, REFRESH_MILLISECONDS)
-  if (newheadX === -1 || newheadY === -1 || newheadX === width_squares || newheadY === height_squares) {
-    game_over = true
+  setTimeout(moveSnake, refresh_milliseconds)
+  if (areSame(newX, -1)) {
+   game_over = true
+  }
+  if (areSame(newY, -1)) {
+   game_over = true
+  }
+  if (areSame(newX, width_squares)) {
+   game_over = true
+  }
+  if (areSame(newY, height_squares)) {
+   game_over = true
   }
 }
 
@@ -184,7 +204,7 @@ function addSection (currentSection) {
     else if (currentSectionDirection === 'down') {
       nextSectionY--
     }
-    var nextSection = createSnakeSection(nextSectionX, nextSectionY)
+    var nextSection = createSection(nextSectionX, nextSectionY)
     currentSection.snake.next = nextSection
     nextSection.snake.direction = currentSectionDirection
     nextSection.snake.futureTurns = cloneArray(currentSectionFutureTurns)
@@ -204,14 +224,14 @@ function moveSection (section) {
   var futureTurns = section.snake.futureTurns
   if (futureTurns) {
     var currentTurn = section.snake.currentTurn
-    var currentTurnIndex = currentTurn * 3
-    var currentTurnX = futureTurns[currentTurnIndex]
+    var currentTurnIndex = multiplyNumbers(currentTurn, 3)
+    var currentTurnX = getValue(futureTurns, currentTurnIndex)
     if (currentTurnX !== undefined) {
       var nextIndex = currentTurnX + 1
-      var currentTurnY = futureTurns[nextIndex]
+      var currentTurnY = getValue(futureTurns, nextIndex)
       if (currentTurnX === x && currentTurnY === y) {
-        var indexAfterNext = nextIndex + 1
-        var currentTurnDirection = futureTurns[indexAfterNext]
+        var indexAfterNext = addNumbers(nextIndex, 1)
+        var currentTurnDirection = getValue(futureTurns, indexAfterNext)
         section.snake.direction = currentTurnDirection
         currentTurn++
         section.snake.currentTurn = currentTurn
@@ -230,9 +250,9 @@ function moveSection (section) {
   else if (direction === 'up') {
     y--
   }
-  var newID = x + '-' + y
-  var currentID = section.id
-  if (currentID === 'head') {
+  var newID = concatenateStrings(x, concatenateStrings('-', y))
+  var currentID = getValue(section, 'id')
+  if (areSame(currentID, 'head')) {
     var foundOverlap = document.getElementById(newID)
     if (foundOverlap) {
       game_over = true
@@ -240,45 +260,50 @@ function moveSection (section) {
     }
   }
   else {
-    section.id = newID
+    setValue(section, 'id', newID)
   }
   section.snake.x = x
   section.snake.y = y
-  section.style.left = x * unit_square + 'px'
-  section.style.top = y * unit_square + 'px'
+  section.style.left = concatenateStrings(multiplyNumbers(x, unit_square), 'px')
+  section.style.top = concatenateStrings(multiplyNumbers(y, unit_square), 'px')
   var attachedSection = section.snake.next
   if (attachedSection) {
     moveSection(attachedSection)
   }
 }
 
-function createSnakeSection (x, y) {
+function createSection (x, y) {
   var section = document.createElement('div')
   section.snake = {}
-  section.id = x + '-' + y
+  section.id = concatenateStrings(x, concatenateStrings('-', y))
   section.snake.x = x
   section.snake.y = y
-  section.style.height = unit_square + 1 + 'px'
-  section.style.width = unit_square + 1 + 'px'
+  section.style.height = concatenateStrings(toString(addNumbers(unit_square, 1)), 'px')
+  section.style.width = concatenateStrings(toString(addNumbers(unit_square, 1)), 'px')
   section.style.borderRadius = '50%'
-  section.style.background = ELEMENT_COLOR
-  section.style.opacity = ELEMENT_OPACITY
+  section.style.background = element_color
+  section.style.opacity = element_opacity
   section.style.position = 'absolute'
-  section.style.left = x * unit_square + 'px'
-  section.style.top = y * unit_square + 'px'
+  section.style.left = concatenteStrings(toString(multiplyNumbers(x, unit_square)), + 'px')
+  section.style.top = concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px')
   section.style.zIndex = 100000
   section.style.border = '2px solid blue'
   game_screen.appendChild(section)
   return section
 }
 
-function movefood () {
+
+
+
+
+
+function moveFood () {
   var foodX = Math.floor( Math.random() * ( width_squares - 1 ) )
   var foodY = Math.floor( Math.random() * ( height_squares - 1 ) )
   var potentialID = foodX + '-' + foodY
   var snakeSection = document.getElementById(potentialID)
   if (snakeSection) {
-    movefood()
+    moveFood()
   }
   else {
     food.snake.x = foodX
@@ -290,13 +315,13 @@ function movefood () {
   }
 }
 
-function movefoodIfTooCloseToStart () {
+function moveClose () {
   var foodLeft = food.style.left
   var foodTop = food.style.top
   if (foodTop === STARTING_TOP) {
     if (foodLeft === starting_left || foodLeft - 1 === starting_left || foodLeft - 2 === starting_left) {
-      movefood()
-      movefoodIfTooCloseToStart()
+      moveFood()
+      moveClose()
     }
   }
 }
