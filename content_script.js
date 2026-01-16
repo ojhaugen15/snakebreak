@@ -240,13 +240,6 @@ function cloneArray (array) {
  }
 }
 
-
-
-
-
-
-
-
 function moveSection (section) {
  var previousDirection = section.snake.direction
  var x = section.snake.x
@@ -272,16 +265,27 @@ function moveSection (section) {
  }
  if (areSame(previousDirection, 'left')) {
   x = differenceNumbers(x, 1)
+  move2(x, y, section)
+  return
  }  
- else if (areSame(previousDirection, 'down')) {
+ if (areSame(previousDirection, 'down')) {
   y = addNumbers(y, 1)
+  move2(x, y, section)
+  return
  }  
- else if (areSame(previousDirection, 'right')) {
+ if (areSame(previousDirection, 'right')) {
   x = addNumbers(x, 1)
+  move2(x, y, section)
+  return
  }  
- else if (areSame(previousDirection, 'up')) {
+ if (areSame(previousDirection, 'up')) {
   y = differenceNumbers(y, 1)
+  move2(x, y, section)
+  return
  }
+}
+
+function move2 (x, y, section) {
  var newID = concatenateStrings(x, concatenateStrings('-', y))
  var currentID = getValue(section, 'id')
  if (areSame(currentID, 'head')) {
@@ -291,9 +295,7 @@ function moveSection (section) {
    return
   }
  }
- else {
-  setValue(section, 'id', newID)
- }
+ setValue(section, 'id', newID)
  section.snake.x = x
  section.snake.y = y
  section.style.left = concatenateStrings(multiplyNumbers(x, unit_square), 'px')
