@@ -70,162 +70,182 @@ function gameOver() {
 
 function keyDown (eventInfo) {
  var eventKey = getValue(eventInfo, 'key')
-  if (areSame(eventKey, 'Escape')) {
-    gameOver()
-    return
-  }
-  event.preventDefault()
-  if (direction_chosen) {
-    return
-  }
-  if (areSame(eventKey, 'ArrowLeft')) {
-    var currentDirection = head.snake.direction
-    if (arentSame(currentDirection, 'right')) {
-     if (arentSame(currentDirection, 'left')) {
-      var newDirection = 'left'
-      head.snake.direction = newDirection
-     }
-    }
-  }
-  else if (areSame(key, 'ArrowRight')) {
-    var currentDirection = head.snake.direction
-    if (arentSame(currentDirection, 'right')) {
-     if (arentSame(currentDirection, 'left')) {
-      var newDirection = 'right'
-      head.snake.direction = newDirection
-    }
-   }
-  }
-  else if (areSame(key, 'ArrowUp')) {
-    var currentDirection = head.snake.direction
-    if (arentSame(currentDirection, 'top')) {
-     if (arentSame(currentDirection, 'down')) {
-      var newDirection = 'up'
-      head.snake.direction = newDirection
-    }
-    }
-  }
-  else if (areSame(key, 'ArrowDown')) {
-    var currentDirection = head.snake.direction
-    if (arentSame(currentDirection, 'top')) {
-     if (arentSame(currentDirection, 'down')) {
-      var newDirection = 'down'
-      head.snake.direction = newDirection
-    }
-   }
-  }
-  if (newDirection) {
+ if (areSame(eventKey, 'Escape')) {
+  gameOver()
+  return
+ }
+ event.preventDefault()
+ if (direction_chosen) {
+  return
+ }
+ if (areSame(eventKey, 'ArrowLeft')) {
+  var currentDirection = head.snake.direction
+  if (arentSame(currentDirection, 'right')) {
+   if (arentSame(currentDirection, 'left')) {
+    var newDirection = 'left'
+    head.snake.direction = newDirection
     direction_chosen = true
+   }
   }
+  return
+ }
+ if (areSame(key, 'ArrowRight')) {
+  var currentDirection = head.snake.direction
+  if (arentSame(currentDirection, 'right')) {
+   if (arentSame(currentDirection, 'left')) {
+    var newDirection = 'right'
+    head.snake.direction = newDirection
+    direction_chosen = true
+   }
+  }
+  return
+ }
+ if (areSame(key, 'ArrowUp')) {
+  var currentDirection = head.snake.direction
+  if (arentSame(currentDirection, 'top')) {
+   if (arentSame(currentDirection, 'down')) {
+    var newDirection = 'up'
+    head.snake.direction = newDirection
+    direction_chosen = true
+   }
+  }
+  return
+ }
+ if (areSame(key, 'ArrowDown')) {
+  var currentDirection = head.snake.direction
+  if (arentSame(currentDirection, 'top')) {
+   if (arentSame(currentDirection, 'down')) {
+    var newDirection = 'down'
+    head.snake.direction = newDirection
+    direction_chosen = true
+   }
+  }
+  return
+ }
 }
 
 function moveSnake () {
-  if (game_over) {
-    return
+ if (game_over) {
+  return
+ }
+ var headX = head.snake.x
+ var headY = head.snake.y
+ if (direction_chosen) {
+  direction_chosen = false
+  var attachedSection = head.snake.next
+  if (attachedSection) {
+   var headDirection = head.snake.direction
+   updateSection(attachedSection, headX, headY, headDirection)
   }
-  var headX = head.snake.x
-  var headY = head.snake.y
-  if (direction_chosen) {
-    direction_chosen = false
-    var attachedSection = head.snake.next
-    if (attachedSection) {
-      var headDirection = head.snake.direction
-      updateSection(attachedSection, headX, headY, headDirection)
-    }
+ }
+ moveSection(head)
+ var newX = head.snake.x
+ var newY = head.snake.y
+ var foodX = food.snake.x
+ var foodY = food.snake.y
+ if (areSame(newX, foodX)) {
+  if (areSame(newY, foodY)) {
+   moveFood()
+   addSection()
+   refresh_milliseconds = differenceNumbers(refresh_milliseconds, refresh_decrement)
   }
-  moveSection(head)
-  var newX = head.snake.x
-  var newY = head.snake.y
-  var foodX = food.snake.x
-  var foodY = food.snake.y
-  if (areSame(newX, foodX)) {
-   if (areSame(newY, foodY)) {
-    moveFood()
-    addSection()
-    refresh_milliseconds = differenceNumbers(refresh_milliseconds, refresh_decrement)
-   }
-  }
-  setTimeout(moveSnake, refresh_milliseconds)
-  if (areSame(newX, -1)) {
-   game_over = true
-   return
-  }
-  if (areSame(newY, -1)) {
-   game_over = true
-   return
-  }
-  if (areSame(newX, width_squares)) {
-   game_over = true
-   return
-  }
-  if (areSame(newY, height_squares)) {
-   game_over = true
-   return
-  }
+ }
+ setTimeout(moveSnake, refresh_milliseconds)
+ if (areSame(newX, -1)) {
+  game_over = true
+  return
+ }
+ if (areSame(newY, -1)) {
+  game_over = true
+  return
+ }
+ if (areSame(newX, width_squares)) {
+  game_over = true
+  return
+ }
+ if (areSame(newY, height_squares)) {
+  game_over = true
+  return
+ }
 }
 
 function updateSection (section, newTurnX, newTurnY, newTurnDirection) {
-  var futureTurns = section.snake.futureTurns
-  if (areSame(futureTurns, undefined)) {
-    futureTurns = []
-    section.snake.currentTurn = 0
-  }
-  futureTurns.push(newTurnX)
-  futureTurns.push(newTurnY)
-  futureTurns.push(newTurnDirection)
-  section.snake.futureTurns = futureTurns
-  var attachedSection = section.snake.next
-  if (attachedSection) {
-    updateSection(attachedSection, newTurnX, newTurnY, newTurnDirection)
-  }
+ var futureTurns = section.snake.futureTurns
+ if (areSame(futureTurns, undefined)) {
+  futureTurns = []
+  section.snake.currentTurn = 0
+ }
+ futureTurns.push(newTurnX)
+ futureTurns.push(newTurnY)
+ futureTurns.push(newTurnDirection)
+ section.snake.futureTurns = futureTurns
+ var attachedSection = section.snake.next
+ if (attachedSection) {
+  updateSection(attachedSection, newTurnX, newTurnY, newTurnDirection)
+ }
 }
 
 function addSection (currentSection) {
-  if (areSame(currentSection, undefined)) {
-    currentSection = head
-  }
-  var attachedSection = currentSection.snake.next
-  if (attachedSection) {
-    addSection(attachedSection)
-  }
-  else {
-    var futureTurns = currentSection.snake.futureTurns
-    var currentDirection = currentSection.snake.direction
-    var currentX = currentSection.snake.x
-    var currentY = currentSection.snake.y
-    var nextX = currentX
-    var nextY = currentY
-    if (areSame(currentDirection, 'left')) {
-      nextX = addNumbers(nextnX, 1)
-    }
-    else if (areSame(currentDirection, 'right')) {
-      nextX = differenceNumbers(nextX, 1)
-    }
-    else if (areSame(currentDirection, 'up')) {
-      nextY = addNumbers(nextY, 1)
-    }
-    else if (areSame(currentSectionDirection, 'down')) {
-      nextY = differenceNumbers(nextY, 1)
-    }
-    var nextSection = createSection(nextX, nextY)
-    currentSection.snake.next = nextSection
-    nextSection.snake.direction = currentDirection
-    nextSection.snake.futureTurns = cloneArray(currentTurns)
-  }
+ if (areSame(currentSection, undefined)) {
+  currentSection = head
+ }
+ var attachedSection = currentSection.snake.next
+ if (attachedSection) {
+  addSection(attachedSection)
+  return
+ }
+ var futureTurns = currentSection.snake.futureTurns
+ var currentDirection = currentSection.snake.direction
+ var currentX = currentSection.snake.x
+ var currentY = currentSection.snake.y
+ var nextX = currentX
+ var nextY = currentY
+ if (areSame(currentDirection, 'left')) {
+  nextX = addNumbers(nextnX, 1)
+  var nextSection = createSection(nextX, nextY)
+  currentSection.snake.next = nextSection
+  nextSection.snake.direction = currentDirection
+  nextSection.snake.futureTurns = cloneArray(currentTurns)
+  return
+ }
+ if (areSame(currentDirection, 'right')) {
+  nextX = differenceNumbers(nextX, 1)
+  var nextSection = createSection(nextX, nextY)
+  currentSection.snake.next = nextSection
+  nextSection.snake.direction = currentDirection
+  nextSection.snake.futureTurns = cloneArray(currentTurns)
+  return
+ }
+ if (areSame(currentDirection, 'up')) {
+  nextY = addNumbers(nextY, 1)
+  var nextSection = createSection(nextX, nextY)
+  currentSection.snake.next = nextSection
+  nextSection.snake.direction = currentDirection
+  nextSection.snake.futureTurns = cloneArray(currentTurns)
+  return
+ }
+ if (areSame(currentSectionDirection, 'down')) {
+  nextY = differenceNumbers(nextY, 1)
+  var nextSection = createSection(nextX, nextY)
+  currentSection.snake.next = nextSection
+  nextSection.snake.direction = currentDirection
+  nextSection.snake.futureTurns = cloneArray(currentTurns)
+  return
+ }
 }
 
 function cloneArray (array) {
-  if (array) {
-    return JSON.parse(JSON.stringify(array))
-  }
+ if (array) {
+  return JSON.parse(JSON.stringify(array))
+ }
 }
 
 function moveSection (section) {
-  var direction = section.snake.direction
-  var x = section.snake.x
-  var y = section.snake.y
-  var futureTurns = section.snake.futureTurns
-  if (futureTurns) {
+ var direction = section.snake.direction
+ var x = section.snake.x
+ var y = section.snake.y
+ var futureTurns = section.snake.futureTurns
+ if (futureTurns) {
     var currentTurn = section.snake.currentTurn
     var currentIndex = multiplyNumbers(currentTurn, 3)
     var currentX = getValue(futureTurns, currentIndex)
