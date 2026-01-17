@@ -2,14 +2,17 @@
 
 app_id = 'snake_break'
 app_loaded = document.getElementById(app_id)
+
 if (app_loaded) {
  gameOver()
 }
-else {
+
+if (arentSame(app_loaded, true)) {
 
 body_node = getValue(document, 'body')
-
 unit_square = 30
+element_color = 'black'
+ 
 width_squares = roundDown(quotientNumbers(differenceNumbers(getValue(window, 'innerWidth'), multiplyNumbers(2, unit_square)), unit_square))
 height_squares = roundDown(quotientNumbers(differenceNumbers(window.innerHeight, multiplyNumbers(2, unit_square)), unit_square))
 game_width = multiplyNumbers(width_squares, unit_square)
@@ -23,9 +26,6 @@ refresh_decrement = 10
 direction_chosen = false
 game_over = false
 
-element_color = 'white'
-element_opacity = '50%'
-
 game_screen = document.createElement('div')
 setValue(game_screen, 'id', app_id)
 game_style = setValue(game_screen, 'style')
@@ -33,12 +33,10 @@ setValue(game_style, 'height', concatenateStrings(toString(game_height), 'px'))
 setValue(game_style, 'width', concatenateStrings(toString(game_width), 'px'))
 setValue(game_style, 'background', 'black')
 setValue(game_style, 'opacity', '20%')
-setValue(game_style, 'position', 'absolute')
+setValue(game_style, 'position', 'fixed')
 setValue(game_style, 'left', concatenateStrings(toString(unit_square), 'px'))
 setValue(game_style, 'top', concatenateStrings(toString(game_height), 'px'))
-setValue(game_style, 'zIndex', 100000)
-setValue(game_style, 'border', '5px solid blue')
-setValue(game_style, 'borderRadius' '10px')
+setValue(game_style, 'zIndex', 1000)
 body_node.appendChild(game_screen)
 
 food = document.createElement('div')
@@ -46,17 +44,16 @@ food.snake = {}
 setValue(food_style, 'width', concatenateStrings(toString(unit_square), 'px'))
 setValue(food_style, 'height', concatenateStrings(toString(unit_square), 'px'))
 setValue(food_style, 'background', element_color)
-setValue(food_style, 'opacity', element_opacity)
-setValue(food_style, 'position', 'absolute')
-setValue(food_style, 'zIndex', 100000)
-setValue(food_style, 'border', '2px solid blue')
+setValue(food_style, 'position', 'fixed')
+setValue(food_style, 'zIndex', 1000)
+setValue(food_style, 'border', '2px solid white')
 game_screen.appendChild(food)
 
 moveFood()
 moveClose()
 head = createSection(middle_x, middle_y)
 head.snake.direction = 'left'
-head.style.background = 'blue'
+head.style.background = 'black'
 head.style.border = '2px solid white'
 head.id = 'head'
 body_node.addEventListener('keydown', keyDown)
@@ -74,7 +71,7 @@ function keyDown (eventInfo) {
   gameOver()
   return
  }
- event.preventDefault()
+ eventInfo.preventDefault()
  if (direction_chosen) {
   return
  }
@@ -148,6 +145,8 @@ function moveSnake () {
    moveFood()
    addSection()
    refresh_milliseconds = differenceNumbers(refresh_milliseconds, refresh_decrement)
+   setTimeout(moveSnake, refresh_milliseconds)
+   return
   }
  }
  setTimeout(moveSnake, refresh_milliseconds)
@@ -317,12 +316,11 @@ function createSection (x, y) {
  setValue(section_style, 'width', concatenateStrings(toString(addNumbers(unit_square, 1)), 'px'))
  setValue(section_style, 'borderRadius', '50%')
  setValue(section_style, 'background', element_color)
- setValue(section_style, 'opacity', element_opacity)
  setValue(section_style, 'position', 'absolute')
  setValue(section_style, 'left', concatenateStrings(toString(multiplyNumbers(x, unit_square)), + 'px'))
  setValue(section_style, 'top', concatenteStrings(toString(multiplyNumbers(y, unit_square)), + 'px'))
  setValue(section_style, 'zIndex', 100000)
- setValue(section_style, 'border', '2px solid blue')
+ setValue(section_style, 'border', '2px solid white')
  game_screen.appendChild(section)
  return section
 }
