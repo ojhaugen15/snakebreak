@@ -168,19 +168,19 @@ function moveSnake () {
  }
 }
 
-function updateSection (section, newTurnX, newTurnY, newTurnDirection) {
+function updateSection (section, newX, newY, newDirection) {
  var futureTurns = section.snake.futureTurns
  if (areSame(futureTurns, undefined)) {
   futureTurns = []
   section.snake.currentTurn = 0
  }
- futureTurns.push(newTurnX)
- futureTurns.push(newTurnY)
- futureTurns.push(newTurnDirection)
+ futureTurns.push(newX)
+ futureTurns.push(newY)
+ futureTurns.push(newDirection)
  section.snake.futureTurns = futureTurns
  var attachedSection = section.snake.next
  if (attachedSection) {
-  updateSection(attachedSection, newTurnX, newTurnY, newTurnDirection)
+  updateSection(attachedSection, newX, newY, newDirection)
  }
 }
 
@@ -200,7 +200,7 @@ function addSection (currentSection) {
  var nextX = currentX
  var nextY = currentY
  if (areSame(currentDirection, 'left')) {
-  nextX = addNumbers(nextnX, 1)
+  nextX = addNumbers(nextX, 1)
   var nextSection = createSection(nextX, nextY)
   currentSection.snake.next = nextSection
   nextSection.snake.direction = currentDirection
