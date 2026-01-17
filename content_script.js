@@ -328,8 +328,8 @@ function createSection (x, y) {
 }
 
 function moveFood () {
- var foodX = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(width_squares, 1)))
- var foodY = roundDown(multiplyNumbers(randomNumber(), differenceNumbers(height_squares, 1)))
+ var foodX = roundDown(multiplyNumbers(randomDecimal(), differenceNumbers(width_squares, 1)))
+ var foodY = roundDown(multiplyNumbers(randomDecimal(), differenceNumbers(height_squares, 1)))
  var potentialID = concatenateStrings(foodX, concatenateStrings('-', foodY))
  var snakeSection = document.getElementById(potentialID)
  if (snakeSection) {
@@ -366,4 +366,53 @@ function moveClose () {
  }
 }
 
+//
+function addNumbers (number1, number2) {
+ return number1 + number2
+}
+
+function differenceNumbers (number1, number2) {
+ return number1 - number2
+}
+
+function getValue (inputObject, keyName) {
+ return inputObject[keyName]
+}
+
+function setValue (inputObject, keyName, valueValue) {
+ inputObject[keyName] = valueValue
+}
+
+function roundDown (inputNumber) {
+ return Math.floor(inputNumber)
+}
+
+function roundUp (inputNumber) {
+ return Math.ceil(inputNumber)
+}
+
+function multiplyNumbers (number1, number2) {
+ return number1 * number2
+}
+
+function quotientNumbers (number1, number2) {
+ return number1 / number2
+}
+
+function areSame (item1, item2) {
+ return item1 === item2
+}
+
+function arentSame (item1, item2) {
+ return item1 !== item2
+}
+
+function toString (inputNumber) {
+ return inputNumber.toString()
+}
+
+function randomDecimal (inputNumber) {
+ return Math.random()
+}
+ 
 }
