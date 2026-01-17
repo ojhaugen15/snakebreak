@@ -248,7 +248,7 @@ function moveSection (section) {
   var currentTurn = section.snake.currentTurn
   var currentIndex = multiplyNumbers(currentTurn, 3)
   var currentX = getValue(futureTurns, currentIndex)
-  if (currentX !== undefined) {
+  if (arentSame(currentX, undefined)) {
    var nextIndex = addNumbers(currentX, 1)
    var currentY = getValue(futureTurns, nextIndex)
    if (areSame(currentX, x)) {
