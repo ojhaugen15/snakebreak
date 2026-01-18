@@ -4,6 +4,7 @@ function messageReceived (request, sender, sendResponse) {
 if (request.message === "icon_clicked") {
 
 
+ 
 
 screen_id = 'snakeojhaugen'
 screen_element = document.getElementById(screen_id)
