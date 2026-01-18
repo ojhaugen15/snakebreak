@@ -25,6 +25,7 @@ unit_width = roundDown(quotientNumbers(differenceNumbers(innerWidth, grid_unit),
 unit_height = roundDown(quotientNumbers(differenceNumbers(innerHeight, grid_unit), grid_unit))
 game_width = multiplyNumbers(unit_width, grid_unit)
 game_height = multiplyNumbers(unit_height, grid_unit)
+food_start = multiplyNumbers(grid_unit, 3)
 
 all_turns = []
 nodes_information = []
@@ -40,7 +41,9 @@ setTimeout(function () {
 }, multiplyNumbers(refresh_interval, .9))
 
 function changeDirection (eventInfo) {
- var keyPressed = eventInfo.code
+ eventInfo.preventDefault()
+ var keyPressed = getValue(eventInfo, 'keyCode')
+ console.log(keyPressed)
  if (areSame(keyPressed, 74)) {
   next_direction = 2
   return
@@ -50,11 +53,11 @@ function changeDirection (eventInfo) {
   return
  }
  if (areSame(keyPressed, 73)) {
-  next_direction = 3
+  next_direction = 1
   return
  }
  if (areSame(keyPressed, 75)) {
-  next_direction = 1
+  next_direction = 3
   return
  }
 }
@@ -79,6 +82,7 @@ function randomDirection () {
 
 function setBoundaries () {
  var boundaryBox = document.createElement('div')
+ setValue(boundaryBox, 'id', 'snakeboundariesojhaugen')
  screen_element.appendChild(boundaryBox)
  var boundaryStyle = getValue(boundaryBox, 'style')
  setValue(boundaryStyle, 'position', 'fixed')
@@ -89,7 +93,7 @@ function setBoundaries () {
  setValue(boundaryStyle, 'border', '2px dashed black')
 }
 
-function createNode (startX, startY, isHead) {
+function createNode (startX, startY, isHead, isFood) {
  var snakeNode = document.createElement('div')
  screen_element.appendChild(snakeNode)
  var nodeStyle = getValue(snakeNode, 'style')
@@ -103,6 +107,9 @@ function createNode (startX, startY, isHead) {
  setValue(nodeStyle, 'position', 'fixed')
  setValue(nodeStyle, 'left', concatenateStrings(startX, 'px'))
  setValue(nodeStyle, 'top', concatenateStrings(startY, 'px'))
+ if (areSame(isFood, true)) {
+  setValue(snakeNode, 'id', 'snakefoodojhaugen')
+ }
 }
 
 function startGame () {
@@ -111,19 +118,35 @@ function startGame () {
  var headX = addNumbers(multiplyNumbers(roundDown(quotientNumbers(unit_width, 2)), grid_unit), game_x)
  var headY = addNumbers(multiplyNumbers(roundDown(quotientNumbers(unit_height, 2)), grid_unit), game_y)
  createNode(headX, headY, true)
+ setFood(headX, headY)
  setTimeout(function () {
   moveHead(headX, headY)
  }, refresh_interval)
 }
 
+function setFood (firstX, firstY) {
+ var randomX = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_width, grid_unit))), game_x)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, firstX)))) {
+  setFood(firstX, firstY)
+  return
+ }
+ var randomY = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_height, grid_unit))), game_y)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, firstY)))) {
+  setFood(firstX, firstY)
+  return
+ }
+ createNode(randomX, randomY, false, true)
+}
+
 function moveHead (headX, headY) {
+	console.log(current_direction, next_direction)
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
   current_direction = next_direction
  }
- removeNodes()
  var newX = getX(headX, current_direction)
  var newY = getY(headY, current_direction)
+ removeNodes()
  createNode(newX, newY, true)
  setTimeout(function () {
   moveHead(newX, newY)
@@ -132,7 +155,6 @@ function moveHead (headX, headY) {
 
 function removeNodes () {
  var screenElements = getValue(screen_element, 'children')
- console.log(screenElements)
  var searchIndex = 0
  var numberElements = getValue(screenElements, 'length')
  while (firstGreater(numberElements, searchIndex)) {
@@ -233,6 +255,10 @@ function randomNumber (inputNumber) {
 
 function isFalsey (inputElement) {
  return !inputElement
+}
+
+function absoluteNumber (inputNumber) {
+ return Math.abs(inputNumber)
 }
 
 
