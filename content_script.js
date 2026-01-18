@@ -121,7 +121,7 @@ function createNode (positionX, positionY, isHead, isFood) {
   setValue(nodes_information, 0, positionX)
   setValue(nodes_information, 1, positionY)
   setValue(nodes_information, 2, current_direction)
-  setValue(nodes_information, 3, current_turn)
+  setValue(nodes_information, 3, addNumbers(current_turn, 0))
  }
  setValue(nodeStyle, 'backgroundColor', 'white')
  setValue(nodeStyle, 'border', '2px solid black')
