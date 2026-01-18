@@ -4,7 +4,6 @@ function messageReceived (request, sender, sendResponse) {
 if (request.message === "icon_clicked") {
 
 
- 
 
 screen_id = 'snakeojhaugen'
 screen_element = document.getElementById(screen_id)
@@ -29,6 +28,7 @@ game_height = multiplyNumbers(unit_height, grid_unit)
 food_start = multiplyNumbers(grid_unit, 3)
 
 all_turns = []
+current_turn = 0
 nodes_information = []
 current_direction = randomDirection()
 next_direction = current_direction 
@@ -63,6 +63,20 @@ function changeDirection (eventInfo) {
   next_direction = 3
   return
  }
+}
+
+function growX (lastX, lastDirection) {
+ if (areSame(moduloNumber(currentDirection, 2), 0)) {
+  return differenceNumbers(lastX, multiplyNumbers(differenceNumbers(1, lastDirection), grid_unit))
+ }
+ return lastX
+}
+
+function growY (lastY, lastDirection) {
+ if (areSame(moduloNumber(currentDirection, 2), 0)) {
+  return differenceNumbers(lastY, multiplyNumbers(differenceNumbers(1, lastDirection), grid_unit))
+ }
+ return lastY
 }
 
 function getX (previousX, currentDirection) {
@@ -104,12 +118,16 @@ function createNode (positionX, positionY, isHead, isFood) {
  setValue(nodeStyle, 'width', concatenateStrings(toString(grid_unit), 'px'))
  if (areSame(isHead, true)) {
   setValue(nodeStyle, 'borderRadius', '50%')
+  setValue(nodes_information, 0, positionX)
+  setValue(nodes_information, 1, positionY)
+  setValue(nodes_information, 2, current_direction)
+  setValue(nodes_information, 3, current_turn)
  }
  setValue(nodeStyle, 'backgroundColor', 'white')
  setValue(nodeStyle, 'border', '2px solid black')
  setValue(nodeStyle, 'position', 'fixed')
  setValue(nodeStyle, 'left', concatenateStrings(positionX, 'px'))
-setValue(nodeStyle, 'top', concatenateStrings(positionY, 'px'))
+ setValue(nodeStyle, 'top', concatenateStrings(positionY, 'px'))
  if (areSame(isFood, true)) {
   setValue(snakeNode, 'id', 'snakefoodojhaugen')
   food_x = positionX
@@ -155,9 +173,29 @@ function hitFood (headX, headY) {
  }
 }
 
+function growSnake () {
+ var numberNodes = quotientNumbers(getValue(nodes_information, 'length'), 4)
+ var lastAddress = multiplyNumbers(differenceNumbers(numberNodes, 1), 4)
+ var lastX = getValue(nodes_information, lastAddress)
+ var lastY = getValue(nodes_information, addNumbers(lastAddress, 1))
+ var lastDirection = getValue(nodes_information, addNumbers(lastAddress, 2))
+ var lastTurn = getValue(nodes_information, addNumbers(lastAddress, 3))
+ var newX = growX(lastX, lastDirection)
+ var newY = growY(lastY, lastDirection)
+ nodes_information.push(newX)
+ nodes_information.push(newY)
+ nodes_information.push(lastDirection)
+ nodes_information.push(lastTurn)
+ createNode(newX, newY)
+}
+
 function moveHead (headX, headY, spedUp) {
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
+  all_turns.push(headX)
+  all_turns.push(headY)
+  all_turns.push(next_direction)
+  current_turn = addNumbers(current_turn, 1)
   current_direction = next_direction
  }
  var newX = getX(headX, current_direction)
@@ -169,14 +207,16 @@ function moveHead (headX, headY, spedUp) {
  if (spedUp) {
   refresh_interval = differenceNumbers(refresh_interval, refresh_decrement)
  }
+ removeNodes()
+ moveBody()
+ createNode(newX, newY, true)
  if (hitFood(newX, newY)) {
   var foodElement = document.getElementById('snakefoodojhaugen')
   screen_element.removeChild(foodElement)
   setFood()
+  growSnake()
   var speedUp = true
  }
- removeNodes()
- createNode(newX, newY, true)
  setTimeout(function () {
   moveHead(newX, newY, speedUp)
  }, refresh_interval)
