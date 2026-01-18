@@ -4,16 +4,16 @@ function messageReceived (request, sender, sendResponse) {
 if (request.message === "icon_clicked") {
 
 
+
 screen_id = 'snakeojhaugen'
 screen_element = document.getElementById(screen_id)
-console.log(screen_element)
 body_node = getValue(document, 'body')
 
 if (screen_element) {
  clearGame()
 }
 
-if (areSame(screen_element, null)) {
+if (isFalsey(screen_element) {
 
 
 
@@ -33,6 +33,8 @@ current_direction = randomDirection()
 next_direction = current_direction 
 refresh_interval = 1000
 refresh_decrement = 10
+food_x = null
+food_y = null
 
 startGame()
 
@@ -93,7 +95,7 @@ function setBoundaries () {
  setValue(boundaryStyle, 'border', '2px dashed black')
 }
 
-function createNode (startX, startY, isHead, isFood) {
+function createNode (positionX, positionY, isHead, isFood) {
  var snakeNode = document.createElement('div')
  screen_element.appendChild(snakeNode)
  var nodeStyle = getValue(snakeNode, 'style')
@@ -105,10 +107,12 @@ function createNode (startX, startY, isHead, isFood) {
  setValue(nodeStyle, 'backgroundColor', 'white')
  setValue(nodeStyle, 'border', '2px solid black')
  setValue(nodeStyle, 'position', 'fixed')
- setValue(nodeStyle, 'left', concatenateStrings(startX, 'px'))
- setValue(nodeStyle, 'top', concatenateStrings(startY, 'px'))
+ setValue(nodeStyle, 'left', concatenateStrings(positionX, 'px'))
+setValue(nodeStyle, 'top', concatenateStrings(positionY, 'px'))
  if (areSame(isFood, true)) {
   setValue(snakeNode, 'id', 'snakefoodojhaugen')
+  food_x = positionX
+  food_y = positionY
  }
 }
 
@@ -125,12 +129,16 @@ function startGame () {
 }
 
 function setFood (firstX, firstY) {
- var randomX = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_width, grid_unit))), game_x)
- if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, firstX)))) {
+ var randomX = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_width, grid_unit))), game_x)k
+ var randomY = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_height, grid_unit))), game_y)
+ if (areSame(firstX, undefined)) {
+  createNode(randomX, randomY, false, true)
+  return
+ }
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, firstX)))){
   setFood(firstX, firstY)
   return
  }
- var randomY = addNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(game_height, grid_unit))), game_y)
  if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, firstY)))) {
   setFood(firstX, firstY)
   return
@@ -138,19 +146,58 @@ function setFood (firstX, firstY) {
  createNode(randomX, randomY, false, true)
 }
 
-function moveHead (headX, headY) {
-	console.log(current_direction, next_direction)
+function hitFood (headX, headY) {
+ if (areSame(food_x, headX)) {
+  if (areSame(food_y, headY)) {
+   return true
+  }
+ }
+}
+
+function moveHead (headX, headY, spedUp) {
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
   current_direction = next_direction
  }
  var newX = getX(headX, current_direction)
  var newY = getY(headY, current_direction)
+ if (checkDied(newX, newY)) {
+  gameOver()
+  return
+ }
+ if (spedUp) {
+  refresh_interval = differenceNumbers(refresh_interval, refresh_decrement)
+ }
+ if (hitFood(newX, newY)) {
+  var foodElement = document.getElementById('snakefoodojhaugen')
+  screen_element.removeChild(foodElement)
+  setFood()
+  var speedUp = true
+ }
  removeNodes()
  createNode(newX, newY, true)
  setTimeout(function () {
-  moveHead(newX, newY)
+  moveHead(newX, newY, speedUp)
  }, refresh_interval)
+}
+
+function checkDied (currentX, currentY) {
+ if (firstGreater(game_x, currentX)) {
+  return true
+ }
+ if (firstGreater(game_y, currentY)) {
+  return true
+ }
+ if (firstGreater(currentX, game_width)) {
+  return true
+ }
+ if (firstGreater(currentY, game_height)) {
+  return true
+ }
+}
+
+function gameOver () {
+ body_node.removeEventListener('keyup', changeDirection) 
 }
 
 function removeNodes () {
