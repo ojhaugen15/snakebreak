@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener(messageReceived)
+`chrome.runtime.onMessage.addListener(messageReceived)
 
 function messageReceived (request, sender, sendResponse) {
 if (request.message === "icon_clicked") {
@@ -189,6 +189,32 @@ function growSnake () {
  createNode(newX, newY)
 }
 
+function moveBody () {
+ var searchEnd = getValue(nodes_information, 'length')
+ var searchIndex = 7
+ while (firstGreater(searchEnd, searchIndex)) {
+  var currentTurn = getValue(nodes_information, searchIndex)
+  var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
+  var turnX = getValue(all_turns, turnBase)
+  var currentX = getValue(nodes_information, differenceNumbers(searchIndex, 3))
+  if (areSame(currentX, turnX)) {
+   var turnY = getValue(all_turns, addNumbers(turnBase, 1)
+   var currentY = getValue(nodes_information, differenceNumbers(searchIndex, 2))
+   if (areSame(currentY, turnY)) {
+    var turnDirection = getValue(all_turns, addNumbers(turnBase, 2))
+    var newX = getX(currentX, turnDirection)
+    var newY = getY(currentY, turnDirection)
+    setValue(nodes_information, differenceNumbers(searchIndex, 3), newX)
+    setValue(nodes_information, differenceNumbers(searchIndex, 2), newY)
+    setValue(nodes_information, differenceNumbers(searchIndex, 1), turnDirection)
+    setValue(nodes_information, searchIndex, addNumbers(currentTurn, 1))
+    createNode(newX, newY)
+   }
+  }
+  searchIndex = addNumbers(searchIndex, 4)
+ }
+}
+
 function moveHead (headX, headY, spedUp) {
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
@@ -354,3 +380,4 @@ function absoluteNumber (inputNumber) {
 
 }
 }
+`
