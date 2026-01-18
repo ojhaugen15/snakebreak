@@ -1,4 +1,4 @@
-`chrome.runtime.onMessage.addListener(messageReceived)
+chrome.runtime.onMessage.addListener(messageReceived)
 
 function messageReceived (request, sender, sendResponse) {
 if (request.message === "icon_clicked") {
@@ -380,4 +380,3 @@ function absoluteNumber (inputNumber) {
 
 }
 }
-`
