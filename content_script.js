@@ -36,12 +36,20 @@ refresh_interval = 1000
 refresh_decrement = 10
 food_x = null
 food_y = null
+element_color = null
+
+situationalColor()
 
 startGame()
 
 setTimeout(function () {
  body_node.addEventListener('keyup', changeDirection)
 }, multiplyNumbers(refresh_interval, .9))
+
+function situationalColor () {
+ element_color = 'black'
+ border_color = 'white'
+}
 
 function changeDirection (eventInfo) {
  eventInfo.preventDefault()
@@ -62,6 +70,37 @@ function changeDirection (eventInfo) {
   next_direction = 3
   return
  }
+ if (areSame(keyPressed, 83)) {
+  next_direction = 2
+  return
+ }
+ if (areSame(keyPressed, 70)) {
+  next_direction = 0
+  return
+ }
+ if (areSame(keyPressed, 69)) {
+  next_direction = 1
+  return
+ }
+ if (areSame(keyPressed, 68)) {
+  next_direction = 3
+  return
+ }
+ if (areSame(keyPressed, 37)) {
+  next_direction = 2
+  return
+ }
+ if (areSame(keyPressed, 39)) {
+  next_direction = 0
+  return
+ }
+ if (areSame(keyPressed, 38)) {
+  next_direction = 1
+  return
+ }
+ if (areSame(keyPressed, 40)) {
+  next_direction = 3
+  return
 }
 
 function growX (lastX, lastDirection) {
@@ -146,15 +185,19 @@ function startGame () {
  }, refresh_interval)
 }
 
-function setFood (firstX, firstY) {
+function setFood (foodX, foodY) {
  var randomX = addNumbers(multiplyNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(unit_width, 1))), grid_unit), game_x)
  var randomY = addNumbers(multiplyNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(unit_height, 1))), grid_unit), game_y)
- if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, firstX)))){
-  setFood(firstX, firstY)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, foodX)))){
+  setFood(foodX, foodY)
   return
  }
- if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, firstY)))) {
-  setFood(firstX, firstY)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, foodY)))) {
+  setFood(foodX, foodY)
+  return
+ }
+ if (onSnake(foodX, foodY)) {
+  setFood(foodX, foodY)
   return
  }
  createNode(randomX, randomY, false, true)
@@ -175,7 +218,6 @@ function growSnake () {
  var lastY = getValue(nodes_information, addNumbers(lastAddress, 1))
  var lastDirection = getValue(nodes_information, addNumbers(lastAddress, 2))
  var lastTurn = getValue(nodes_information, addNumbers(lastAddress, 3))
- console.log(lastX, lastY, lastDirection)
  var newX = growX(lastX, lastDirection)
  var newY = growY(lastY, lastDirection)
  nodes_information.push(newX)
@@ -193,10 +235,12 @@ function moveBody () {
   var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
   var turnX = getValue(all_turns, turnBase)
   var currentX = getValue(nodes_information, differenceNumbers(searchIndex, 3))
+  var noTurn = true
   if (areSame(currentX, turnX)) {
    var turnY = getValue(all_turns, addNumbers(turnBase, 1))
    var currentY = getValue(nodes_information, differenceNumbers(searchIndex, 2))
    if (areSame(currentY, turnY)) {
+    noTurn = false
     var turnDirection = getValue(all_turns, addNumbers(turnBase, 2))
     var newX = getX(currentX, turnDirection)
     var newY = getY(currentY, turnDirection)
@@ -206,6 +250,14 @@ function moveBody () {
     setValue(nodes_information, searchIndex, addNumbers(currentTurn, 1))
     createNode(newX, newY)
    }
+  }
+  if (noTurn) {
+   var currentDirection = getValue(nodes_information, differenceNumbers(searchIndex, 1))
+   var newX = getX(currentX, currentDirection)
+   var newY = getY(currentY, currentDirection)
+   setValue(nodes_information, differenceNumbers(searchIndex, 3), newX)
+   setValue(nodes_information, differenceNumbers(searchIndex, 2), newY)
+   createNode(newX, newY)
   }
   searchIndex = addNumbers(searchIndex, 4)
  }
@@ -231,13 +283,17 @@ function moveHead (headX, headY, spedUp) {
  }
  removeNodes()
  createNode(newX, newY, true)
- //moveBody()
+ moveBody()
  if (hitFood(newX, newY)) {
   var foodElement = document.getElementById('snakefoodojhaugen')
   screen_element.removeChild(foodElement)
   setFood(newX, newY)
   growSnake()
   var speedUp = true
+ }
+ if (onSnake(newX, newY)) {
+  gameOver()
+  return
  }
  setTimeout(function () {
   moveHead(newX, newY, speedUp)
@@ -261,6 +317,17 @@ function checkDied (currentX, currentY) {
 
 function gameOver () {
  body_node.removeEventListener('keyup', changeDirection) 
+ var finalScore = body_node.createElement('div')
+ screen_element.appendChild(finalScore)
+ finalScore.textContent = concatenateStrings('Your final score is ', differenceNumbers(quotientNumbers(getValue(nodes_information, 'length'), 4), 1))
+ var scoreStyle = getValue(finalScore, 'style')
+ setValue(scoreStyle, 'fontFamily', 'Courier')
+ setValue(scoreStyle, 'fontSize', '30px')
+ setValue(scoreStyle, 'position', 'fixed')
+ setValue(scoreStyle, 'left', '30px')
+ setValue(scoreStyle, 'top', '30px')
+ setValue(scoreStyle, 'color', element_color)
+ setValue(scoreStyle, 'textShadow', '-1px 0 ' + border_color + ', 0  1px ' + border_color + ', 1px 0 ' + border_color + ', 0 -1px ' + border_color)
 }
 
 function removeNodes () {
@@ -290,6 +357,23 @@ function setScreen () {
  setValue(screenStyle, 'top', 0)
  setValue(screenStyle, 'left', 0)
  setValue(screenStyle, 'zIndex', 1000)
+}
+
+function onSnake (thingX, thingY) {
+ var searchIndex = 0
+ var search2 = 1
+ var searchEnd = getValue(nodes_information, 'length') 
+ while (firstGreater(searchEnd, searchIndex)) {
+  var snakeX = getValue(nodes_information, searchIndex)
+  if (areSame(snakeX, thingX)) {
+   var snakeY = getValue(nodes_information, search2)
+   if (areSame(snakeY, thingY)) {
+    return true
+   }
+  }
+  searchIndex = addNumbers(searchIndex, 4)
+  search2 = addNumbers(search2, 4) 
+ }  
 }
 
 }
