@@ -36,9 +36,8 @@ refresh_interval = 1000
 refresh_decrement = 10
 food_x = null
 food_y = null
-element_color = null
-
-situationalColor()
+element_color = ''
+border_color = ''
 
 startGame()
 
@@ -47,6 +46,19 @@ setTimeout(function () {
 }, multiplyNumbers(refresh_interval, .9))
 
 function situationalColor () {
+ var canvasElement = document.createElement('canvas')
+ screen_element.appendChild(canvasElement)
+ var canvasContext = canvasElement.getContext('2d')
+ var searchIndex = 0
+ var sampleNumber = 10
+ var sumColors = 0
+ while (firstGreater(sampleNumber, searchIndex)) {
+  var randomX = roundNumber(randomNumber() * innerWidth)
+  var randomY = roundNumber(randomNumber() * innerHeight)
+  console.log(canvasContext.getImageData(randomX, randomY, 0, 0))
+  searchIndex = addNumbers(searchIndex, 1)
+ }
+
  element_color = 'black'
  border_color = 'white'
 }
@@ -175,6 +187,7 @@ function createNode (positionX, positionY, isHead, isFood) {
 
 function startGame () {
  setScreen()
+ situationalColor()
  setBoundaries()
  var headX = addNumbers(multiplyNumbers(roundDown(quotientNumbers(unit_width, 2)), grid_unit), game_x)
  var headY = addNumbers(multiplyNumbers(roundDown(quotientNumbers(unit_height, 2)), grid_unit), game_y)
