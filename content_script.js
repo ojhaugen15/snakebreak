@@ -178,12 +178,11 @@ function createNode (positionX, positionY, isHead, isFood) {
  setValue(nodeStyle, 'height', concatenateStrings(toString(grid_unit), 'px'))
  setValue(nodeStyle, 'width', concatenateStrings(toString(grid_unit), 'px'))
  if (areSame(isHead, true)) {
-    console.log('heyo')
   setValue(nodeStyle, 'borderRadius', '50%')
   setValue(nodes_information, 0, positionX)
   setValue(nodes_information, 1, positionY)
   setValue(nodes_information, 2, current_direction)
-  setValue(nodes_information, 3, addNumbers(current_turn, 0))
+  setValue(nodes_information, 3, current_turn)
   setValue(nodeStyle, 'height', concatenateStrings(toString(addNumbers(grid_unit, 0.5)), 'px'))
   setValue(nodeStyle, 'width', concatenateStrings(toString(addNumbers(grid_unit, 0.5)), 'px'))
  }
