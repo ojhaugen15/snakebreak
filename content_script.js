@@ -178,6 +178,7 @@ function createNode (positionX, positionY, isHead, isFood) {
  setValue(nodeStyle, 'height', concatenateStrings(toString(grid_unit), 'px'))
  setValue(nodeStyle, 'width', concatenateStrings(toString(grid_unit), 'px'))
  if (areSame(isHead, true)) {
+    console.log('heyo')
   setValue(nodeStyle, 'borderRadius', '50%')
   setValue(nodes_information, 0, positionX)
   setValue(nodes_information, 1, positionY)
@@ -257,9 +258,9 @@ function moveBody () {
  var searchEnd = getValue(nodes_information, 'length')
  var searchIndex = 7
  while (firstGreater(searchEnd, searchIndex)) {
-  console.log('searchIndex: ', searchIndex)
-  console.log('nodes_information: ', nodes_information)
-  console.log('all_turns: ', all_turns)
+  //console.log('searchIndex: ', searchIndex)
+  //console.log('nodes_information: ', nodes_information)
+  //console.log('all_turns: ', all_turns)
   var currentTurn = getValue(nodes_information, searchIndex)
   var noTurn = true
   var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
@@ -358,7 +359,7 @@ function gameOver () {
  screen_element.appendChild(finalScore)
  var scoreNumber = differenceNumbers(quotientNumbers(getValue(nodes_information, 'length'), 4), 1)
  var text1 = concatenateStrings('Your final ', game_width)
- var text2 = concatenateStrings(' by ', game_height)
+ var text2 = concatenateStrings(' x ', game_height)
  var text3 = concatenateStrings(' pixel game score is: ', scoreNumber)
  finalScore.textContent = concatenateStrings(concatenateStrings(text1, text2), text3)
  var scoreStyle = getValue(finalScore, 'style')
