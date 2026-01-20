@@ -91,7 +91,6 @@ function situationalColor () {
 }
 
 function changeDirection (eventInfo) {
- eventInfo.preventDefault()
  var keyPressed = getValue(eventInfo, 'keyCode')
  if (areSame(keyPressed, 74)) {
   next_direction = 2
@@ -122,22 +121,6 @@ function changeDirection (eventInfo) {
   return
  }
  if (areSame(keyPressed, 68)) {
-  next_direction = 3
-  return
- }
- if (areSame(keyPressed, 37)) {
-  next_direction = 2
-  return
- }
- if (areSame(keyPressed, 39)) {
-  next_direction = 0
-  return
- }
- if (areSame(keyPressed, 38)) {
-  next_direction = 1
-  return
- }
- if (areSame(keyPressed, 40)) {
   next_direction = 3
   return
  }
@@ -200,8 +183,8 @@ function createNode (positionX, positionY, isHead, isFood) {
   setValue(nodes_information, 1, positionY)
   setValue(nodes_information, 2, current_direction)
   setValue(nodes_information, 3, addNumbers(current_turn, 0))
-  setValue(nodeStyle, 'height', concatenateStrings(toString(addNumbers(grid_unit + 0.5)), 'px'))
-  setValue(nodeStyle, 'width', concatenateStrings(toString(addNumbers(grid_unit + 0.5)), 'px'))
+  setValue(nodeStyle, 'height', concatenateStrings(toString(addNumbers(grid_unit, 0.5)), 'px'))
+  setValue(nodeStyle, 'width', concatenateStrings(toString(addNumbers(grid_unit, 0.5)), 'px'))
  }
  setValue(nodeStyle, 'backgroundColor', element_color)
  setValue(nodeStyle, 'border', concatenateStrings('2px solid ', border_color))
@@ -274,9 +257,9 @@ function moveBody () {
  var searchEnd = getValue(nodes_information, 'length')
  var searchIndex = 7
  while (firstGreater(searchEnd, searchIndex)) {
-  //console.log('searchIndex: ', searchIndex)
-  //console.log('nodes_information: ', nodes_information)
-  //console.log('all_turns: ', all_turns)
+  console.log('searchIndex: ', searchIndex)
+  console.log('nodes_information: ', nodes_information)
+  console.log('all_turns: ', all_turns)
   var currentTurn = getValue(nodes_information, searchIndex)
   var noTurn = true
   var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
@@ -314,13 +297,13 @@ function moveBody () {
 function moveHead (headX, headY, spedUp) {
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
-  current_turn = addNumbers(current_turn, 1)
   current_direction = next_direction
-  if (hit_first) {
+  //if (hit_first) {
+   current_turn = addNumbers(current_turn, 1)
    all_turns.push(headX)
    all_turns.push(headY)
    all_turns.push(next_direction)
-  }
+//  }
  }
  var newX = getX(headX, current_direction)
  var newY = getY(headY, current_direction)
