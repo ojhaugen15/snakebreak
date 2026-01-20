@@ -10,7 +10,14 @@ screen_element = document.getElementById(screen_id)
 body_node = getValue(document, 'body')
 
 if (screen_element) {
- clearGame()
+ var ghostMode = localStorage.getItem('snakeghostojhaugen')
+ if (ghostMode) {
+  goGhost()
+  localStorage.setItem('snakeghostojhaugen', '')
+ }
+ if (isFalsey(ghostMode)) {
+  clearGame()
+ }
 }
 
 if (isFalsey(screen_element)) {
@@ -28,7 +35,7 @@ game_height = multiplyNumbers(unit_height, grid_unit)
 food_start = multiplyNumbers(grid_unit, 3)
 
 all_turns = []
-current_turn = 0
+current_turn = 1
 nodes_information = []
 current_direction = randomDirection()
 next_direction = current_direction 
@@ -38,6 +45,10 @@ food_x = null
 food_y = null
 element_color = ''
 border_color = ''
+hit_first = false
+head_timeout = null
+
+localStorage.setItem('snakeghostojhaugen', 'true')
 
 startGame()
 
@@ -55,10 +66,26 @@ function situationalColor () {
  while (firstGreater(sampleNumber, searchIndex)) {
   var randomX = roundNumber(randomNumber() * innerWidth)
   var randomY = roundNumber(randomNumber() * innerHeight)
-  console.log(canvasContext.getImageData(randomX, randomY, 0, 0))
+  var colorData = getValue(canvasContext.getImageData(randomX, randomY, 1, 1), 'data')
+  var pixelRed = getValue(colorData, 0)
+  var pixelGreen = getValue(colorData, 1)
+  var pixelBlue = getValue(colorData, 2)
+  var pixelBrightness = roundNumber(quotientNumbers(addNumbers(addNumbers(pixelRed, pixelBlue), pixelGreen), 3))
+  sumColors = addNumbers(sumColors, pixelBrightness)
   searchIndex = addNumbers(searchIndex, 1)
  }
-
+ var finalAverage = roundNumber(quotientNumbers(sumColors, sampleNumber))
+ if (arentSame(finalAverage, 0)) {
+  console.log('getImageData functioning...')
+ }
+ element_color = 'white'
+ border_color = 'black'
+ return
+ if (firstGreater(finalAverage, 128)) {
+  element_color = 'white'
+  border_color = 'black'
+  return
+ }
  element_color = 'black'
  border_color = 'white'
 }
@@ -113,6 +140,7 @@ function changeDirection (eventInfo) {
  if (areSame(keyPressed, 40)) {
   next_direction = 3
   return
+ }
 }
 
 function growX (lastX, lastDirection) {
@@ -157,7 +185,7 @@ function setBoundaries () {
  setValue(boundaryStyle, 'left', concatenateStrings(toString(game_x), 'px'))
  setValue(boundaryStyle, 'width', concatenateStrings(toString(game_width), 'px'))
  setValue(boundaryStyle, 'height', concatenateStrings(toString(game_height), 'px'))
- setValue(boundaryStyle, 'border', '2px dashed black')
+ setValue(boundaryStyle, 'border', concatenateStrings('2px dashed ', border_color))
 }
 
 function createNode (positionX, positionY, isHead, isFood) {
@@ -172,9 +200,11 @@ function createNode (positionX, positionY, isHead, isFood) {
   setValue(nodes_information, 1, positionY)
   setValue(nodes_information, 2, current_direction)
   setValue(nodes_information, 3, addNumbers(current_turn, 0))
+  setValue(nodeStyle, 'height', concatenateStrings(toString(addNumbers(grid_unit + 0.5)), 'px'))
+  setValue(nodeStyle, 'width', concatenateStrings(toString(addNumbers(grid_unit + 0.5)), 'px'))
  }
- setValue(nodeStyle, 'backgroundColor', 'white')
- setValue(nodeStyle, 'border', '2px solid black')
+ setValue(nodeStyle, 'backgroundColor', element_color)
+ setValue(nodeStyle, 'border', concatenateStrings('2px solid ', border_color))
  setValue(nodeStyle, 'position', 'fixed')
  setValue(nodeStyle, 'left', concatenateStrings(positionX, 'px'))
  setValue(nodeStyle, 'top', concatenateStrings(positionY, 'px'))
@@ -198,19 +228,19 @@ function startGame () {
  }, refresh_interval)
 }
 
-function setFood (foodX, foodY) {
+function setFood (headX, headY) {
  var randomX = addNumbers(multiplyNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(unit_width, 1))), grid_unit), game_x)
  var randomY = addNumbers(multiplyNumbers(roundNumber(multiplyNumbers(randomNumber(), differenceNumbers(unit_height, 1))), grid_unit), game_y)
- if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, foodX)))){
-  setFood(foodX, foodY)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomX, headX)))){
+  setFood(headX, headY)
   return
  }
- if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, foodY)))) {
-  setFood(foodX, foodY)
+ if (firstGreater(food_start, absoluteNumber(differenceNumbers(randomY, headY)))) {
+  setFood(headX, headY)
   return
  }
- if (onSnake(foodX, foodY)) {
-  setFood(foodX, foodY)
+ if (onSnake(randomX, randomY)) {
+  setFood(headX, headY)
   return
  }
  createNode(randomX, randomY, false, true)
@@ -226,11 +256,11 @@ function hitFood (headX, headY) {
 
 function growSnake () {
  var numberNodes = quotientNumbers(getValue(nodes_information, 'length'), 4)
- var lastAddress = multiplyNumbers(differenceNumbers(numberNodes, 1), 4)
- var lastX = getValue(nodes_information, lastAddress)
- var lastY = getValue(nodes_information, addNumbers(lastAddress, 1))
- var lastDirection = getValue(nodes_information, addNumbers(lastAddress, 2))
- var lastTurn = getValue(nodes_information, addNumbers(lastAddress, 3))
+ var lastBase = multiplyNumbers(differenceNumbers(numberNodes, 1), 4)
+ var lastX = getValue(nodes_information, lastBase)
+ var lastY = getValue(nodes_information, addNumbers(lastBase, 1))
+ var lastDirection = getValue(nodes_information, addNumbers(lastBase, 2))
+ var lastTurn = getValue(nodes_information, addNumbers(lastBase, 3))
  var newX = growX(lastX, lastDirection)
  var newY = growY(lastY, lastDirection)
  nodes_information.push(newX)
@@ -244,24 +274,29 @@ function moveBody () {
  var searchEnd = getValue(nodes_information, 'length')
  var searchIndex = 7
  while (firstGreater(searchEnd, searchIndex)) {
+  //console.log('searchIndex: ', searchIndex)
+  //console.log('nodes_information: ', nodes_information)
+  //console.log('all_turns: ', all_turns)
   var currentTurn = getValue(nodes_information, searchIndex)
-  var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
-  var turnX = getValue(all_turns, turnBase)
-  var currentX = getValue(nodes_information, differenceNumbers(searchIndex, 3))
   var noTurn = true
-  if (areSame(currentX, turnX)) {
-   var turnY = getValue(all_turns, addNumbers(turnBase, 1))
-   var currentY = getValue(nodes_information, differenceNumbers(searchIndex, 2))
-   if (areSame(currentY, turnY)) {
-    noTurn = false
-    var turnDirection = getValue(all_turns, addNumbers(turnBase, 2))
-    var newX = getX(currentX, turnDirection)
-    var newY = getY(currentY, turnDirection)
-    setValue(nodes_information, differenceNumbers(searchIndex, 3), newX)
-    setValue(nodes_information, differenceNumbers(searchIndex, 2), newY)
-    setValue(nodes_information, differenceNumbers(searchIndex, 1), turnDirection)
-    setValue(nodes_information, searchIndex, addNumbers(currentTurn, 1))
-    createNode(newX, newY)
+  var turnBase = multiplyNumbers(3, differenceNumbers(currentTurn, 1))
+  var currentX = getValue(nodes_information, differenceNumbers(searchIndex, 3))
+  var currentY = getValue(nodes_information, differenceNumbers(searchIndex, 2))
+  if (isFalsey(currentTurn)) {
+   var turnX = getValue(all_turns, turnBase)
+   if (areSame(currentX, turnX)) {
+    var turnY = getValue(all_turns, addNumbers(turnBase, 1))
+    if (areSame(currentY, turnY)) {
+     noTurn = false
+     var turnDirection = getValue(all_turns, addNumbers(turnBase, 2))
+     var newX = getX(currentX, turnDirection)
+     var newY = getY(currentY, turnDirection)
+     setValue(nodes_information, differenceNumbers(searchIndex, 3), newX)
+     setValue(nodes_information, differenceNumbers(searchIndex, 2), newY)
+     setValue(nodes_information, differenceNumbers(searchIndex, 1), turnDirection)
+     setValue(nodes_information, searchIndex, addNumbers(currentTurn, 1))
+     createNode(newX, newY)
+    }
    }
   }
   if (noTurn) {
@@ -279,15 +314,20 @@ function moveBody () {
 function moveHead (headX, headY, spedUp) {
  var validTurn = addNumbers(current_direction, next_direction)
  if (arentSame(moduloNumber(validTurn, 2), 0)) {
-  all_turns.push(headX)
-  all_turns.push(headY)
-  all_turns.push(next_direction)
   current_turn = addNumbers(current_turn, 1)
   current_direction = next_direction
+  if (hit_first) {
+   all_turns.push(headX)
+   all_turns.push(headY)
+   all_turns.push(next_direction)
+  }
  }
  var newX = getX(headX, current_direction)
  var newY = getY(headY, current_direction)
  if (checkDied(newX, newY)) {
+  removeNodes()
+  createNode(newX, newY, true)
+  moveBody()
   gameOver()
   return
  }
@@ -298,17 +338,18 @@ function moveHead (headX, headY, spedUp) {
  createNode(newX, newY, true)
  moveBody()
  if (hitFood(newX, newY)) {
+  hit_first = true
   var foodElement = document.getElementById('snakefoodojhaugen')
   screen_element.removeChild(foodElement)
   setFood(newX, newY)
   growSnake()
   var speedUp = true
  }
- if (onSnake(newX, newY)) {
+ if (onSnake(newX, newY, true)) {
   gameOver()
   return
  }
- setTimeout(function () {
+ head_timeout = setTimeout(function () {
   moveHead(newX, newY, speedUp)
  }, refresh_interval)
 }
@@ -330,17 +371,25 @@ function checkDied (currentX, currentY) {
 
 function gameOver () {
  body_node.removeEventListener('keyup', changeDirection) 
- var finalScore = body_node.createElement('div')
+ var finalScore = document.createElement('div')
  screen_element.appendChild(finalScore)
- finalScore.textContent = concatenateStrings('Your final score is ', differenceNumbers(quotientNumbers(getValue(nodes_information, 'length'), 4), 1))
+ var scoreNumber = differenceNumbers(quotientNumbers(getValue(nodes_information, 'length'), 4), 1)
+ var text1 = concatenateStrings('Your final ', game_width)
+ var text2 = concatenateStrings(' by ', game_height)
+ var text3 = concatenateStrings(' pixel game score is: ', scoreNumber)
+ finalScore.textContent = concatenateStrings(concatenateStrings(text1, text2), text3)
  var scoreStyle = getValue(finalScore, 'style')
  setValue(scoreStyle, 'fontFamily', 'Courier')
- setValue(scoreStyle, 'fontSize', '30px')
+ setValue(scoreStyle, 'fontSize', concatenateStrings(grid_unit, 'px'))
  setValue(scoreStyle, 'position', 'fixed')
- setValue(scoreStyle, 'left', '30px')
- setValue(scoreStyle, 'top', '30px')
+ setValue(scoreStyle, 'left', concatenateStrings(grid_unit, 'px'))
+ setValue(scoreStyle, 'top', concatenateStrings(grid_unit, 'px'))
  setValue(scoreStyle, 'color', element_color)
- setValue(scoreStyle, 'textShadow', '-1px 0 ' + border_color + ', 0  1px ' + border_color + ', 1px 0 ' + border_color + ', 0 -1px ' + border_color)
+ var shadow1 = concatenateStrings('-1px 0 ', border_color)
+ var shadow2 = concatenateStrings(', 0 1px ', border_color)
+ var shadow3 = concatenateStrings(', 1px 0 ', border_color)
+ var shadow4 = concatenateStrings(', 0 -1px ', border_color)
+ setValue(scoreStyle, 'textShadow', concatenateStrings(concatenateStrings(shadow1, shadow2), concatenateStrings(shadow3, shadow4)))
 }
 
 function removeNodes () {
@@ -372,9 +421,13 @@ function setScreen () {
  setValue(screenStyle, 'zIndex', 1000)
 }
 
-function onSnake (thingX, thingY) {
+function onSnake (thingX, thingY, isHead) {
  var searchIndex = 0
  var search2 = 1
+ if (isHead) {
+  searchIndex = 4
+  search2 = 5
+ }
  var searchEnd = getValue(nodes_information, 'length') 
  while (firstGreater(searchEnd, searchIndex)) {
   var snakeX = getValue(nodes_information, searchIndex)
@@ -394,18 +447,22 @@ function onSnake (thingX, thingY) {
 
 
 
-//
+function clearGame () {
+ body_node.removeChild(screen_element)
+ clearTimeout(head_timeout)
+}
 
+function goGhost () {
+ setValue(getValue(screen_element, 'style'), 'opacity', '5%')
+}
+
+//
 function firstGreater (number1, number2) {
  return number1 > number2
 }
 
 function concatenateStrings (string1, string2) {
  return string1 + string2
-}
-
-function clearGame () {
- body_node.removeChild(screen_element)
 }
 
 function getValue (inputObject, keyName) {
